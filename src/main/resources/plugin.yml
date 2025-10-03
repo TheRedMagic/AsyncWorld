@@ -1,0 +1,4 @@
+name: AsyncWorld
+version: '1.0'
+main: gg.undefinedaquatic.asyncWorld.AsyncWorld
+api-version: '1.21'
