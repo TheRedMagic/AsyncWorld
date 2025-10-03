@@ -2,3 +2,5 @@ name: AsyncWorld
 version: '1.0'
 main: gg.undefinedaquatic.asyncWorld.AsyncWorldMain
 api-version: '1.21'
+commands:
+  testing:

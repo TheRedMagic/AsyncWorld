@@ -1,11 +1,7 @@
 package gg.undefinedaquatic.asyncWorld.driver
 
-import gg.undefinedaquatic.asyncWorld.format.WorldFormat
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.StreamTagVisitor
 import net.minecraft.world.level.ChunkPos
-import net.minecraft.world.level.chunk.storage.RegionFile
-import net.minecraft.world.level.chunk.storage.RegionStorageInfo
 
 interface WorldDriver {
 
@@ -17,11 +13,9 @@ interface WorldDriver {
 
     fun writeEntity(chunkPos: ChunkPos, chunkData: ByteArray?)
 
-    fun getRegionFile(chunkcoordintpair: ChunkPos): RegionFile
-
     fun scanChunk(chunkPos: ChunkPos, visitor: StreamTagVisitor)
 
-    fun info(): RegionStorageInfo
+    val isRegion: Boolean
 
     fun close()
 

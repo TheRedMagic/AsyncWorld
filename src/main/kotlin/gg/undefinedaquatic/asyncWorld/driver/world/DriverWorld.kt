@@ -1,11 +1,13 @@
-package gg.undefinedaquatic.asyncWorld.driver
+package gg.undefinedaquatic.asyncWorld.driver.world
 
+import gg.undefinedaquatic.asyncWorld.StorageInfo
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.RandomSequences
 import net.minecraft.world.level.CustomSpawner
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.TicketStorage
 import net.minecraft.world.level.chunk.storage.ChunkStorage
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo
 import net.minecraft.world.level.dimension.LevelStem
@@ -17,15 +19,16 @@ import org.bukkit.generator.ChunkGenerator
 import java.util.concurrent.Executor
 
 class DriverWorld(
+    val storageInfo: StorageInfo,
     server: MinecraftServer,
     dispatcher: Executor,
     storageSource: LevelStorageSource.LevelStorageAccess,
     levelData: PrimaryLevelData,
-    dimension: ResourceKey<Level>,
+    dimension: ResourceKey<Level?>,
     levelStem: LevelStem,
     isDebug: Boolean,
     biomeZoomSeed: Long,
-    customSpawners: List<CustomSpawner>,
+    customSpawners: List<CustomSpawner?>,
     tickTime: Boolean,
     randomSequences: RandomSequences?,
     env: World.Environment,
@@ -50,12 +53,29 @@ class DriverWorld(
 
      init {
 
+         chunkSource::class.java.getDeclaredField("chunkMap").apply {
+             isAccessible = true
+         } .set(chunkSource, DriverChunkMap(
+             this,
+             storageSource,
+             server.fixerUpper,
+             server.structureManager,
+             dispatcher,
+             chunkSource.mainThreadProcessor,
+             chunkSource,
+             chunkSource.generator,
+             null,
+             { server.overworld().dataStorage },
+             this.dataStorage.computeIfAbsent<TicketStorage>(TicketStorage.TYPE),
+             spigotConfig.viewDistance
+         ))
+
          val regionStorageInfo = RegionStorageInfo(
              storageSource.levelId, dimension, "chunk"
          )
          ChunkStorage::class.java.getDeclaredField("storage").apply {
              isAccessible = true
-         }.set(chunkSource.chunkMap, DriverRegionFileStorage(regionStorageInfo, storageSource.getDimensionPath(level.dimension()).resolve("region"), false))
+         }.set(chunkSource.chunkMap, DriverRegionFileStorage(regionStorageInfo, storageSource.getDimensionPath(level.dimension()).resolve("region"), false, storageInfo))
 
      }
 

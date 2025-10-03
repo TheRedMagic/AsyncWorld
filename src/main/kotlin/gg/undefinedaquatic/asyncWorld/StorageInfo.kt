@@ -10,10 +10,10 @@ class StorageInfo(
     val format: WorldFormat,
 ) {
 
-    val isEntity = driver.info().type != "region"
+    val isEntity = !driver.isRegion
 
     fun read(chunkPos: ChunkPos): CompoundTag? {
-        return format.read(if (isEntity) driver.readEntity(chunkPos) else driver.readRegion(chunkPos))
+        return format.read(chunkPos, if (isEntity) driver.readEntity(chunkPos) else driver.readRegion(chunkPos))
     }
 
     fun write(chunkPos: ChunkPos, chunkData: CompoundTag?) {
